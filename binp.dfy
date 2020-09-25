@@ -123,6 +123,7 @@ method binarySearch(q: seq<int>, key: int)
 			decreases hi-lo
 		{
 			var mid := (lo+hi)/2;
+			assert (lo+hi)/2 == (lo+((hi-lo)/2));
 			if key < q[mid] 
 			{
 				hi := mid;
