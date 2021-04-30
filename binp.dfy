@@ -1,18 +1,18 @@
-predicate IsLog2 (h: nat -> nat)  
+predicate IsLog2 (f: nat -> nat)  
 {
-	exists c :nat, n0: nat :: IsLog2From(c, n0, h)
+	exists c :nat, n0: nat :: IsLog2From(c, n0, f)
 }
-predicate IsLog2From (c :nat, n0: nat, h: nat -> nat)
+predicate IsLog2From (c :nat, n0: nat, f: nat -> nat)
 {
-	forall n: nat :: 0 < n0 <= n ==> h(n) <= Log2(n) * c
+	forall n: nat {:induction}:: 0 < n0 <= n ==> f(n) <= Log2(n) * c
 }
-lemma logarithmic (c :nat, n0: nat, h: nat -> nat)
-	requires IsLog2From(c, n0, h)
-	ensures IsLog2(h)
+lemma logarithmic (c :nat, n0: nat, f: nat -> nat)
+	requires IsLog2From(c, n0, f)
+	ensures IsLog2(f)
 {}
 predicate IsOLog2n (n: nat ,t: nat )
 {
-	exists h: nat -> nat :: IsLog2(h) && t<=h(n)
+	exists h: nat -> nat :: IsLog2(f) && t<=h(n)
 }
 //help for Ο(log2(n)
 function Log2 (x: nat) : nat
@@ -84,6 +84,8 @@ lemma logarithmicCalcLemma(n: nat)returns(c :nat, n0:nat)
 	assert f(n)<= 3*(1+Log2(n));
 	assert n>=2 ==> (f(n)<=6*Log2(n));
 	c, n0 := 6, 2;
+	assert n>=n0 ==> (f(n)<=c*Log2(n));
+	assert IsLog2From(6,2,f);
 }
 
 
@@ -169,4 +171,3 @@ predicate TBSisOLog2n(q: seq<int>,lo: nat, hi: nat, key: int)
 {
 	exists f: nat->nat ,c: nat, n0: nat :: IsLog2From(c, n0, f) &&  TBS(q,lo,hi,key)<=f(|q|)
 }
-
