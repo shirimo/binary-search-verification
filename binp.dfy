@@ -1,10 +1,11 @@
+\\predicates to define O(log2n)
 predicate IsLog2 (f: nat -> nat)  
 {
 	exists c :nat, n0: nat :: IsLog2From(c, n0, f)
 }
 predicate IsLog2From (c :nat, n0: nat, f: nat -> nat)
 {
-	forall n: nat {:induction}:: 0 < n0 <= n ==> f(n) <= Log2(n) * c
+	forall n: nat {:induction n}:: 0 < n0 <= n ==> f(n) <= Log2(n) * c
 }
 lemma logarithmic (c :nat, n0: nat, f: nat -> nat)
 	requires IsLog2From(c, n0, f)
@@ -22,15 +23,6 @@ function Log2 (x: nat) : nat
 	natDivision(x,2);
 	if x==1 then 0 else 1+ Log2(x/2)
 }
-//recursive Binarysearch function that returns the number of calls we make to the function (binary search time complexity)
-function TBS(q: seq<int>,lo: int, hi: int, key: int) : nat
-	requires 0 <= lo <= hi <= |q|
-	decreases hi-lo
-{
-	var mid := (lo+hi)/2;
-	if (hi-lo==0|||q|==0) then 0 else if  key==q[mid] || (hi-lo==1) then 1 else if key<q[mid] then 1 + TBS(q,lo,mid,key) else 1 + TBS(q,mid+1,hi,key)
-}
-
 lemma natDivision(a: nat, b: nat)
   requires b>0 
   ensures a/b == (a as real / b as real).Floor
@@ -40,7 +32,7 @@ lemma natDivision(a: nat, b: nat)
   assert a as real == (a / b) as real * b as real + (a % b) as real;
   assert a as real / b as real == (a / b) as real + (a % b) as real / b as real;
 }
-lemma log2Mono (x: nat, y: nat)
+lemma {:induction x,y}log2Mono (x: nat, y: nat)
 	requires x>0 && y>0
 	ensures y>=x ==> Log2(y)>=Log2(x)
 	decreases x,y 
@@ -68,7 +60,7 @@ lemma logarithmicCalcLemma(n: nat)returns(c :nat, n0:nat)
 	requires n>0
 	ensures IsLog2From(c,n0,f)
 {	
-	calc {
+	calc <= {
 		f(n);
 	==
 		2*Log2(n+1) + 1;
@@ -147,8 +139,15 @@ method binarySearch(q: seq<int>, key: int)
 	}
 }
 
-
-lemma TBSisLog (q: seq<int>,lo: nat, hi: nat, key: int)
+//recursive Binarysearch function that returns the number of calls we make to the function (binary search time complexity)
+function TBS(q: seq<int>,lo: int, hi: int, key: int) : nat
+	requires 0 <= lo <= hi <= |q|
+	decreases hi-lo
+{
+	var mid := (lo+hi)/2;
+	if (hi-lo==0|||q|==0) then 0 else if  key==q[mid] || (hi-lo==1) then 1 else if key<q[mid] then 1 + TBS(q,lo,mid,key) else 1 + TBS(q,mid+1,hi,key)
+}
+lemma {:induction q, lo, hi, key}TBSisLog (q: seq<int>,lo: nat, hi: nat, key: int)
 	requires |q|>0
 	requires 0 <= lo < hi <= |q|
 	decreases hi-lo
@@ -171,3 +170,4 @@ predicate TBSisOLog2n(q: seq<int>,lo: nat, hi: nat, key: int)
 {
 	exists f: nat->nat ,c: nat, n0: nat :: IsLog2From(c, n0, f) &&  TBS(q,lo,hi,key)<=f(|q|)
 }
+
