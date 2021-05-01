@@ -164,10 +164,3 @@ lemma {:induction q, lo, hi, key}TBSisLog (q: seq<int>,lo: nat, hi: nat, key: in
 		TBSisLog(q,mid+1,hi,key);
 	}
 }
-predicate TBSisOLog2n(q: seq<int>,lo: nat, hi: nat, key: int)
-	requires |q|>0
-	requires 0 <= lo < hi <= |q|
-{
-	exists f: nat->nat ,c: nat, n0: nat :: IsLog2From(c, n0, f) &&  TBS(q,lo,hi,key)<=f(|q|)
-}
-
