@@ -1,4 +1,8 @@
 \\predicates to define O(log2n)
+predicate IsOLog2n (n: nat ,t: nat )
+{
+	exists f: nat -> nat :: IsLog2(f) && t<=f(n)
+}
 predicate IsLog2 (f: nat -> nat)  
 {
 	exists c :nat, n0: nat :: IsLog2From(c, n0, f)
@@ -11,27 +15,15 @@ lemma logarithmic (c :nat, n0: nat, f: nat -> nat)
 	requires IsLog2From(c, n0, f)
 	ensures IsLog2(f)
 {}
-predicate IsOLog2n (n: nat ,t: nat )
-{
-	exists h: nat -> nat :: IsLog2(f) && t<=h(n)
-}
+
 //help for Ο(log2(n)
 function Log2 (x: nat) : nat
 	requires x>0
 	decreases x
 {
-	natDivision(x,2);
 	if x==1 then 0 else 1+ Log2(x/2)
 }
-lemma natDivision(a: nat, b: nat)
-  requires b>0 
-  ensures a/b == (a as real / b as real).Floor
-  
-{
-  assert a == (a / b) * b + (a % b);
-  assert a as real == (a / b) as real * b as real + (a % b) as real;
-  assert a as real / b as real == (a / b) as real + (a % b) as real / b as real;
-}
+
 lemma {:induction x,y}log2Mono (x: nat, y: nat)
 	requires x>0 && y>0
 	ensures y>=x ==> Log2(y)>=Log2(x)
